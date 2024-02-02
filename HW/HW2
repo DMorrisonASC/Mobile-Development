@@ -1,0 +1,108 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart'; // For input formatters
+
+void main() {
+  runApp(MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Input Formatting Exercise',
+      home: InputFormattingPage(),
+    );
+  }
+}
+
+class InputFormattingPage extends StatefulWidget {
+  @override
+  _InputFormattingPageState createState() => _InputFormattingPageState();
+}
+
+class _InputFormattingPageState extends State<InputFormattingPage> {
+  final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _cardController = TextEditingController();
+
+  // TODO: Add initState and dispose methods if necessary
+  @override
+  void initState() {
+    super.initState();
+    _phoneController.text = "";
+    _cardController.text = "";
+  }
+
+  @override
+  @override
+  void dispose() {
+    _phoneController.dispose(); // Dispose the controller
+    _cardController.dispose(); // Dispose the controller
+    super.dispose();
+  }
+
+  // TODO: Implement the phone number TextField logic
+
+
+  // TODO: Implement the credit card TextField logic
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Input Formatting Exercise'),
+      ),
+      body: Padding(
+        padding: EdgeInsets.all(16.0),
+        child: Column(
+          children: <Widget>[
+            TextField(
+              controller: _phoneController,
+              decoration: InputDecoration(
+                labelText: 'Phone Number',
+                hintText: '(123) 456-7890',
+              ),
+              keyboardType: TextInputType.number,
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              onChanged: (text) {
+                final StringBuffer newText = StringBuffer();
+
+                for (int i = 0; i < text.length; i++) {
+                  if (i == 0) {
+                    newText.write('(');
+                  }
+
+                  newText.write(text[i]);
+
+                  if (i == 2 && text.length > 3) {
+                    newText.write(') ');
+                  } else if (i == 5 && text.length > 6) {
+                    newText.write('-');
+                  }
+                }
+
+                _phoneController.text = newText.toString();
+                if (text.length > 10) {
+                  _phoneController.text = _phoneController.text.substring(0, 14);
+                }
+              },
+
+
+              // TODO: Implement onChanged logic
+            ),
+            SizedBox(height: 20),
+            TextField(
+              controller: _cardController,
+              decoration: InputDecoration(
+                labelText: 'Credit Card Number',
+                hintText: '1234 5678 9012 3456',
+              ),
+              keyboardType: TextInputType.number,
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              // TODO: Implement onChanged logic
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
