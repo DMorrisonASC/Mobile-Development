@@ -1,0 +1,183 @@
+/*
+Author: Daeshaun Morrison, Muhlenberg College class of 2024(daeshaunkmorrison@gmail.com)
+Date: 2/2/2024
+Instructor: Professor Silveyra
+Description: Create a Flutter app that performs different actions based on user input from a combination of UI elements. The app should have the following components:
+
+Radio Buttons: Two radio buttons labeled "Option A" and "Option B".
+Button: A regular button that triggers an action based on the radio selection and slider value.
+Text Fields: At least two TextField widgets for user input.
+Slider: A Slider to select a value from a range.
+Combined Action: When the button is pressed, combine the text from one of the TextFields and the selected radio button option to display in a SnackBar or on screen, along with the value from the slider.
+Gestures: Implement three different gestures on various widgets:
+A Tap gesture on one of the text fields.
+A LongPress gesture on the button.
+A Swipe or Drag gesture on the slider.
+Errors:
+ */
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Complex UI Interaction Exercise',
+      home: UIInteractionPage(),
+    );
+  }
+}
+
+class UIInteractionPage extends StatefulWidget {
+  @override
+  _UIInteractionPageState createState() => _UIInteractionPageState();
+}
+
+enum Options { optionA, optionB; }
+
+class _UIInteractionPageState extends State<UIInteractionPage> {
+  Options _selectedOption = Options.optionA;
+  double _sliderValue = 0.0;
+  Color _buttonColor = Colors.yellow;
+  final TextEditingController _textFieldController1 = TextEditingController();
+  final TextEditingController _textFieldController2 = TextEditingController();
+
+
+
+  // TODO: Implement initState and dispose methods if necessary
+  @override
+  void initState() {
+    super.initState();
+    _textFieldController1.text = "";
+    _textFieldController2.text = "";
+  }
+
+  @override
+  void dispose() {
+    _textFieldController1.dispose(); // Dispose the controller
+    _textFieldController2.dispose(); // Dispose the controller
+    super.dispose();
+  }
+  // TODO: Implement the logic for radio buttons
+
+
+  // TODO: Implement the logic for the slider
+  void _handleSliderChange(double? value) {
+    setState(() {
+      _sliderValue = value ?? _sliderValue;
+    });
+  }
+  // TODO: Implement the button pressed action
+  void _handleRadioValueChange(Options? value) {
+    setState(() {
+      _selectedOption = value ?? _selectedOption;
+      // print(value);
+    });
+  }
+
+  // TODO: Implement the gesture detections
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Complex UI Interaction'),
+      ),
+      body: Padding(
+        padding: EdgeInsets.all(16.0),
+        child: Column(
+          children: <Widget>[
+            // TODO: Add the radio buttons here
+            ListTile(
+              title: const Text('Option A'),
+              leading: Radio(
+                  value: Options.optionA,
+                  groupValue: _selectedOption,
+                  onChanged: _handleRadioValueChange
+              ),
+            ),
+            ListTile(
+              title: const Text('Option B'),
+              leading: Radio(
+                  value: Options.optionB,
+                  groupValue: _selectedOption,
+                  onChanged: _handleRadioValueChange,
+              ),
+            ),
+
+            // TODO: Add the text fields here
+            GestureDetector(
+                onTap: () { print('I was tapped');
+                  },
+                child: TextField(
+                controller: _textFieldController1,
+                onTap: () { print('I was tapped1');},
+                onChanged: (value) => setState(() {
+
+                }),
+                decoration: InputDecoration(
+                  labelText: 'Enter Food',
+                  hintText: 'Ice-cream',
+                ),
+              )
+            ),
+            GestureDetector(
+              child: TextField(
+                controller: _textFieldController2,
+                onChanged: (value) => setState(() {
+
+                }),
+                decoration: InputDecoration(
+                    labelText: 'Enter Food',
+                    hintText: 'Pancakes'
+                ),
+              ),
+            ),
+            // TODO: Add the slider here
+            GestureDetector(
+              onHorizontalDragUpdate: (details) {
+                setState(() {
+                  print('Hi');
+                });
+              },
+              child: Slider(
+                value: _sliderValue,
+                min: 0,
+                max: 100,
+                divisions: 100,
+                label: _sliderValue.round().toString(),
+                onChanged: _handleSliderChange,
+              ),
+            ),
+            // TODO: Add the button here
+            ElevatedButton(
+              onPressed: () {
+                String _choice = _selectedOption.toString();
+                String _food1 = _textFieldController1.text;
+                final snackBar = SnackBar(
+                  content: Text('$_choice + $_food1 + $_sliderValue '),
+                );
+
+
+                ScaffoldMessenger.of(context).showSnackBar(snackBar);
+              },
+              style: ButtonStyle(backgroundColor: MaterialStatePropertyAll<Color>(_buttonColor)),
+              child: Text('Submit'),
+              onLongPress: () {
+                setState(() {
+                  _buttonColor = Colors.orange;
+
+                });
+              },
+            ),
+
+            // TODO: Add GestureDetector or other widgets for gestures
+          ],
+        ),
+      ),
+    );
+  }
+}
