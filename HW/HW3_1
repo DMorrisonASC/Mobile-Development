@@ -1,0 +1,156 @@
+/*
+Author: Daeshaun Morrison, Muhlenberg College class of 2024(daeshaunkmorrison@gmail.com)
+Date: 2/9/2024
+Instructor: Professor Silveyra
+Description:
+Errors:
+
+*/
+
+import 'package:flutter/material.dart';
+import 'package:five_pointed_star/five_pointed_star.dart';
+
+void main() => runApp(MyApp());
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: Scaffold(
+        appBar: AppBar(
+          title: Text('Simple Form Example'),
+        ),
+        body: MyCustomForm(),
+      ),
+    );
+  }
+}
+
+// Define a custom Form widget.
+class MyCustomForm extends StatefulWidget {
+  @override
+  _MyCustomFormState createState() => _MyCustomFormState();
+}
+
+// Define the corresponding State class.
+// This class holds the data related to the form.
+class _MyCustomFormState extends State<MyCustomForm> {
+  // Create a global key that uniquely identifies the Form widget
+  // and allows validation of the form.
+  final _formKey = GlobalKey<FormState>();
+  bool is_Checked = false;
+  int _ratingCount = 0;
+  String _dropSelect = "Public";
+
+
+  @override
+  Widget build(BuildContext context) {
+    // Build a Form widget using the _formKey created above.
+    return Form(
+      key: _formKey,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          TextFormField(
+            decoration: InputDecoration(
+              border: OutlineInputBorder(),
+              hintText: 'Enter Name',
+            ),
+
+            // The validator receives the text that the user has entered.
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Field can not be empty';
+              }
+              return null;
+            },
+          ),
+          TextFormField(
+            decoration: InputDecoration(
+              border: OutlineInputBorder(),
+              hintText: 'Enter Age',
+            ),
+
+            // The validator receives the text that the user has entered.
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Field can not be empty';
+              }
+              return null;
+            },
+          ),
+          TextFormField(
+            decoration: InputDecoration(
+              border: OutlineInputBorder(),
+              hintText: 'Enter Email',
+            ),
+            // The validator receives the text that the user has entered.
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Field can not be empty';
+              }
+              return null;
+            },
+          ),
+          FivePointedStar(
+            onChange: (count) {
+              setState(() {
+                 _ratingCount = count;
+              });
+            },
+          ),
+          Center(
+            child: DropdownButtonFormField(
+              value: _dropSelect,
+              onChanged: (value) {},
+              isExpanded: true,
+              items: const <DropdownMenuItem>[
+                // Put widgets in the drop down menu here
+                DropdownMenuItem(child: SizedBox(child: Text("Public")), value: "Public"),
+                DropdownMenuItem(child: SizedBox(child: Text("Private")), value: "Private"),
+                DropdownMenuItem(child: SizedBox(child: Text("Homeschool")), value: "Homeschooled"),
+              ],
+            ),
+          ),
+          CheckboxListTile(
+              controlAffinity: ListTileControlAffinity.leading,
+              title: Text("By checking this box you are agreeing to the Terms and Conditions"),
+              value: is_Checked,
+              subtitle: !is_Checked
+                  ? Padding(
+                padding: EdgeInsets.fromLTRB(12.0, 0, 0, 0),
+                child: Text('Required field', style: TextStyle(color: Color(0xFFe53935), fontSize: 12),),)
+                  : null,
+              onChanged: (value) {
+              setState(() {
+                is_Checked = !is_Checked;
+              });
+          }),
+          // Submit button
+          Text(_ratingCount.toString(),style: TextStyle(fontWeight: FontWeight.bold),),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 16.0),
+            child: ElevatedButton(
+              onPressed: () {
+                // Validate returns true if the form is valid, or false otherwise.
+                if (_formKey.currentState?.validate() == true && is_Checked == true) {
+                  // If the form is valid, display a Snackbar.
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Processing Data')),
+                  );
+                }
+                else {
+                  // If invalid,...
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Check Required Fields'),),
+                  );
+                }
+              },
+              child: Text('Submit'),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
