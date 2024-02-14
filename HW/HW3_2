@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'Book.dart';
 
 void main() {
   runApp(const MyApp());
@@ -55,13 +56,21 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  var allBooks = {
-    1: ["Pikachu's mystery", "John Doe", "Some vague description. Some vague description. Some vague description. "],
-    2: ["The Communist Manifesto", "Jane Doe", "Some vague description. Some vague description. Some vague description. "],
-  };
+  // var allBooks = {
+  //   1: ["Pikachu's mystery", "John Doe", "Some vague description. Some vague description. Some vague description. "],
+  //   2: ["The Communist Manifesto", "Jane Doe", "Some vague description. Some vague description. Some vague description. "],
+  // };
+
 
   @override
   Widget build(BuildContext context) {
+    List<Book> allBooks = [];
+    Book book1 = Book(title: "Pikachu's mystery", author: "John Doe", description: "Some vague description. Some vague description. Some vague description. ");
+    Book book2 = Book(title: "The Communist Manifesto", author: "Karl Marx", description: "The text outlines the relationship between the means of production, relations of production, forces of production, and the mode of production, and posits that changes in society's economic base effect changes in its superstructure.");
+    Book book3 = Book(title: "Pro-union", author: "Working class", description: "Joining together in unions enables workers to negotiate for higher wages and benefits and improve conditions in the workplace.");
+    allBooks.add(book1);
+    allBooks.add(book2);
+    allBooks.add(book3);
     // This method is rerun every time setState is called, for instance as done
     // by the _incrementCounter method above.
     //
@@ -82,15 +91,15 @@ class _MyHomePageState extends State<MyHomePage> {
         // Center is a layout widget. It takes a single child and positions it
         // in the middle of the parent.
         child: ListView(
-            children: allBooks.entries.map((entry) {
+            children: allBooks.map((entry) {
               return ListTile(
                 leading: Icon(Icons.book),
-                title: Text(entry.value[0]), // Book Title
+                title: Text(entry.title), // Book Title
                 subtitle: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Author: ${entry.value[1]}'), // Author
-                    Text('Description: ${entry.value[2]}'), // Description
+                    Text('Author: ${entry.author}'), // Author
+                    Text('Description: ${entry.description}'), // Description
                   ],
                 ),
                   trailing: Icon(Icons.line_style),
@@ -102,15 +111,5 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 }
-// ListTile(
-//   leading: Icon(Icons.book),
-//   title: Text("Book 1"),
-//   subtitle: Column(
-//     crossAxisAlignment: CrossAxisAlignment.start,
-//     children: [
-//       Text("Author 1"),
-//       Text("Description: Click to read more"),
-//     ],
-//   ),
 
-// ),
+
