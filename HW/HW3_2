@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'Book.dart';
+import 'DetailsPage.dart';
 
 void main() {
   runApp(const MyApp());
@@ -65,7 +66,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     List<Book> allBooks = [];
-    Book book1 = Book(title: "Pikachu's mystery", author: "John Doe", description: "Some vague description. Some vague description. Some vague description. ");
+    Book book1 = Book(title: "Pikachu's mystery", author: "Satoshi Tajiri", description: "Pokémon is a Japanese media franchise consisting of video games, animated series and films, a trading card game, and other related media.");
     Book book2 = Book(title: "The Communist Manifesto", author: "Karl Marx", description: "The text outlines the relationship between the means of production, relations of production, forces of production, and the mode of production, and posits that changes in society's economic base effect changes in its superstructure.");
     Book book3 = Book(title: "Pro-union", author: "Working class", description: "Joining together in unions enables workers to negotiate for higher wages and benefits and improve conditions in the workplace.");
     allBooks.add(book1);
@@ -92,8 +93,15 @@ class _MyHomePageState extends State<MyHomePage> {
         // in the middle of the parent.
         child: ListView(
             children: allBooks.map((entry) {
+              Book eachBook = entry;
               return ListTile(
                 leading: Icon(Icons.book),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => DetailsPage(book: eachBook)),
+                  );
+                },
                 title: Text(entry.title), // Book Title
                 subtitle: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -111,5 +119,3 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 }
-
-
