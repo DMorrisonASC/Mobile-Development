@@ -2,7 +2,7 @@
 Author: Daeshaun Morrison, Muhlenberg College class of 2024(daeshaunkmorrison@gmail.com)
 Date: 2/9/2024
 Instructor: Professor Silveyra
-Description:
+Description: Design a Flutter application that simulates a student application form for enrolling in a new school. This form should collect various pieces of information from the student and include a custom star rating widget to rate their interest in different school programs.
 Errors:
 
 */
@@ -50,8 +50,7 @@ class _MyCustomFormState extends State<MyCustomForm> {
       padding: const EdgeInsets.all(8.0),
       child: Form(
         key: _formKey,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: ListView(
           children: <Widget>[
             TextFormField(
               decoration: InputDecoration(
