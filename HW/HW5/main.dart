@@ -17,8 +17,6 @@ class MyApp extends StatelessWidget {
       home:  MyHomePage(),
     );
   }
-
-
 }
 
 void _showDialog(BuildContext context) {
@@ -56,13 +54,12 @@ void _showDialog(BuildContext context) {
   );
 }
 
-
 class MyHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Firestore Data'),
+        title: Text('Firestore Data: longPress = Delete, tap = details, doubletap = changed "used"'),
       ),
       body: FirestoreList(),
       floatingActionButton: FloatingActionButton(
@@ -92,6 +89,11 @@ class FireCollection {
       collection.doc(docID).update({'used': true});
     }
   }
+
+  void deleteDoc(docID) {
+    final collection = FirebaseFirestore.instance.collection('pokemon');
+    collection.doc(docID).delete();
+  }
 }
 
 class FirestoreList extends StatelessWidget {
@@ -109,7 +111,6 @@ class FirestoreList extends StatelessWidget {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Text("Loading");
         }
-
         return ListView(
           children: snapshot.data!.docs.map((DocumentSnapshot document) {
             Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
@@ -128,6 +129,7 @@ class FirestoreList extends StatelessWidget {
               onDoubleTap: () {
                 FireCollection().updateCollection(document.id, data);
               },
+              onLongPress: () => FireCollection().deleteDoc(document.id),
             );
           }).toList(),
         );
