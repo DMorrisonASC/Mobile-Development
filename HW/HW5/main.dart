@@ -14,85 +14,73 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          title: Text('Firestore Data'),
-        ),
-        body: FirestoreList(),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return AlertDialog(
-                    title: Text("Alert Dialog"),
-                    content: Text("Dialog Content"),
-                  );
-                });
-          },
-          child: Icon(Icons.add),
-        ),
-      ),
+      home:  MyHomePage(),
     );
   }
 
-  void _showDialog(BuildContext context) {
-    String documentName = '';
 
-    // showDialog(
-    //   context: context,
-    //   builder: (BuildContext context) {
-    //     return AlertDialog(
-    //       title: Text('Enter Document Name'),
-    //       content: TextField(
-    //         onChanged: (value) {
-    //           documentName = value;
-    //         },
-    //         decoration: InputDecoration(hintText: 'Document Name'),
-    //       ),
-    //       actions: <Widget>[
-    //         TextButton(
-    //           child: Text('Cancel'),
-    //           onPressed: () {
-    //             Navigator.of(context).pop();
-    //           },
-    //         ),
-    //         TextButton(
-    //           child: Text('Create'),
-    //           onPressed: () {
-    //             print('New document created: $documentName');
-    //             Navigator.of(context).pop();
-    //           },
-    //         ),
-    //       ],
-    //     );
-    //   },
-    // );
+}
 
+void _showDialog(BuildContext context) {
+  String documentName = '';
 
-    showDialog(
-      context: context,
-      builder: (context) =>
-          AlertDialog(
-            title: Text('Submitted Text'),
-            actions: <Widget>[
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: Text('OK'),
-              ),
-            ],
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text('Enter Document Name'),
+        content: TextField(
+          onChanged: (value) {
+            documentName = value;
+          },
+          decoration: InputDecoration(hintText: 'Document Name'),
+        ),
+        actions: <Widget>[
+          TextButton(
+            child: Text('Cancel'),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
           ),
+          TextButton(
+            child: Text('Create'),
+            onPressed: () {
+              FireCollection.createCollectionWithDocument(documentName);
+              print('New document created: $documentName');
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      );
+    },
+  );
+}
+
+
+class MyHomePage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Firestore Data'),
+      ),
+      body: FirestoreList(),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          _showDialog(context);
+        },
+        child: Icon(Icons.add),
+      ),
     );
   }
 
 }
 
 class FireCollection {
-  static Future<void> createCollectionWithDocument() async {
-    await FirebaseFirestore.instance.collection('notes').add({
-      'title': 'First Note',
-      'content': 'This is my first note!',
-      'created': FieldValue.serverTimestamp(),
+  static Future<void> createCollectionWithDocument(name) async {
+    await FirebaseFirestore.instance.collection('pokemon').add({
+      'name': name,
+      'used': false,
     });
   }
 
