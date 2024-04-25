@@ -1,5 +1,20 @@
+/* Author: Daeshaun Morrison, Muhlenberg College class of 2024(daeshaunkmorrison@gmail.com)
+Date:
+Instructor: Professor Silveyra
+Extra features:
+1) `nearby_response()` is instantiated and populated by a JSON file from Google Places API
+2) Added at least one extra Widget: GoogleMaps (commented out)
+3) Separated the program into multiple files
+4) Updated the database by the user: `MyHomePage(title: 'Welcome ${FirebaseAuth.instance.currentUser?.email}')`
+5)
+Errors:
+1) Google Map and fetched nearby places can not be displayed at same time.
+2) No shared Preferences; "Incorporate sharedPreferences for at least three values"
+
+ */
 import 'dart:convert';
 import 'package:bathroom_app/model/nearby_response.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -8,6 +23,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 
+import 'listBathrooms.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -43,79 +59,29 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   late GoogleMapController mapController;
   late Position _currentPosition;
-  final LatLng _center = const LatLng(40.598204944182676, -75.50867363097836);
+  late LatLng _center;
+  bool _locationLoaded = false; // Track if the location has been loaded
+  bool _detailsLoaded = false; // Track if the location has been loaded
 
-  var apiKey = '';
+  var apiKey = 'AIzaSyAnLTvi4kMJBcfUBFjB2aWS0j1zim7dAKA'; // Replace with your Google Maps API key
   var placeId = 'ChIJqdGUQQgDGTkRMWBf2gAKAEQ';
   String radius = "9000";
-  // double latitude = 31.5111093;
-  // double longitude = 74.279664;
 
-  NearbyPlacesResponse nearbyPlacesResponse = NearbyPlacesResponse();
+  final DraggableScrollableController sheetController = DraggableScrollableController();
 
+  late NearbyPlacesResponse nearbyPlacesResponse = NearbyPlacesResponse();
+  // late NearbyPlacesResponse nearbyPlacesResponse;
 
   @override
   void initState() {
     super.initState();
-    _getCurrentLocation();
-    // getNearbyPlaces();
-    // _printPlaceDetails();
-  }
+    _getCurrentLocation(); // Call to get current location only once
+    _getNearbyPlaces();
 
-  void _onMapCreated(GoogleMapController controller) {
-    mapController = controller;
-  }
-
-  void _getCurrentLocation() async {
-    Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high);
-    setState(() {
-      _currentPosition = position;
-    });
-    debugPrint(_currentPosition.latitude.toString());
-    debugPrint(_currentPosition.longitude.toString());
-  }
-
-  void getNearbyPlaces() async {
-    var url = Uri.parse('https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=' + _currentPosition.latitude.toString() + ','
-        + _currentPosition.longitude.toString() + '&radius=' + radius + '&key=' + apiKey);
-    debugPrint(url.toString());
-
-    var response = await http.post(url);
-
-    nearbyPlacesResponse = NearbyPlacesResponse.fromJson(jsonDecode(response.body));
-
-    setState(() {});
-  }
-
-  Future<Map<String, dynamic>> fetchPlaceDetails(String placeId, String apiKey) async {
-    final response = await http.get(Uri.parse('https://maps.googleapis.com/maps/api/place/details/json?place_id=$placeId&key=$apiKey'));
-
-    if (response.statusCode == 200) {
-      return json.decode(response.body);
-    } else {
-      throw Exception('Failed to load place details');
-    }
-  }
-
-  void _printPlaceDetails() async {
-    try {
-      Map<String, dynamic> placeDetails = await fetchPlaceDetails(placeId, apiKey);
-      // Do something with the place details
-      print(placeDetails);
-    } catch (e) {
-      print('Error: $e');
-    }
   }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
@@ -130,24 +96,37 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ],
       ),
-      body: 
-      SingleChildScrollView(
-        child: Column(
-          children: [
-            // GoogleMap(
-            //   onMapCreated: _onMapCreated,
-            //   initialCameraPosition: CameraPosition(target: _center, zoom: 11.0),
-            // ),
-            ElevatedButton(onPressed: () {
-              getNearbyPlaces();
-            }, child: const Text("Get nearby places")),
+      body: _locationLoaded // Check if location is loaded
+          ? Stack(
+        children: [
+          GoogleMap(
+            onMapCreated: _onMapCreated,
+            initialCameraPosition: CameraPosition(target: _center, zoom: 11.0),
+          ),
+          DraggableScrollableSheet(
+            controller: sheetController,
+            builder: (BuildContext context, scrollController) {
+              debugPrint("here ${nearbyPlacesResponse.results}");
+              return ListBathrooms(scrollController: scrollController, nearbyPlacesResponse: nearbyPlacesResponse);
+            },
+          ),
+          ElevatedButton(onPressed: (){
 
-            if(nearbyPlacesResponse.results != null)
-              for(int i = 0 ; i < nearbyPlacesResponse.results!.length; i++)
-                nearbyPlacesWidget(nearbyPlacesResponse.results![i])
+            _getNearbyPlaces();
+            setState(() {
 
-          ],
-        ),
+            });
+
+          }, child: const Text("Get Nearby Places")),
+          //
+          // if(nearbyPlacesResponse.results != null)
+          //   for(int i = 0 ; i < nearbyPlacesResponse.results!.length; i++)
+          //     nearbyPlacesWidget(nearbyPlacesResponse.results![i])
+
+        ],
+      )
+          : Center(
+        child: CircularProgressIndicator(),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
@@ -158,28 +137,61 @@ class _MyHomePageState extends State<MyHomePage> {
         },
         tooltip: 'Sign up Or Login',
         child: const Icon(Icons.login),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
-
-    );
-  }
-
-  Widget nearbyPlacesWidget(Results results) {
-
-    return Container(
-      width: MediaQuery.of(context).size.width,
-      margin: const EdgeInsets.only(top: 10,left: 10,right: 10),
-      padding: const EdgeInsets.all(5),
-      decoration: BoxDecoration(border: Border.all(color: Colors.black),borderRadius: BorderRadius.circular(10)),
-      child: Column(
-        children: [
-          Text("Name: " + results.name!),
-          Text("Location: " + results.geometry!.location!.lat.toString() + " , " + results.geometry!.location!.lng.toString()),
-          Text(results.openingHours != null ? "Open" : "Closed"),
-        ],
       ),
     );
+  }
+
+  void _onMapCreated(GoogleMapController controller) {
+    mapController = controller;
+  }
+
+  Future<void> _getCurrentLocation() async {
+    Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
+    setState(() {
+      _currentPosition = position;
+      _center = LatLng(_currentPosition.latitude, _currentPosition.longitude);
+      _locationLoaded = true; // Set location loaded to true
+    });
+    debugPrint(_currentPosition.latitude.toString());
+    debugPrint(_currentPosition.longitude.toString());
+  }
+
+  void _getNearbyPlaces() async {
+
+    var url = Uri.parse('https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${_currentPosition.latitude},${_currentPosition.longitude}&radius=$radius&key=$apiKey');
+
+    var response = await http.post(url);
+
+    setState(() {
+      nearbyPlacesResponse = NearbyPlacesResponse.fromJson(jsonDecode(response.body));
+      _detailsLoaded = true;
+      debugPrint("Yup ${nearbyPlacesResponse.results?[0]}");
+    });
 
   }
+
+// Widget nearbyPlacesWidget(Results results) {
+//   return Container(
+//     width: MediaQuery.of(context).size.width,
+//     margin: const EdgeInsets.only(top: 10, left: 10, right: 10),
+//     padding: const EdgeInsets.all(5),
+//     decoration: BoxDecoration(
+//         border: Border.all(color: Colors.deepPurple),
+//         borderRadius: BorderRadius.circular(10)),
+//     child: Column(
+//       children: [
+//         Text("Name: " + results.name!),
+//         Text("ID: " + results.placeId!),
+//         Text("Location: " +
+//             results.geometry!.location!.lat.toString() +
+//             " , " +
+//             results.geometry!.location!.lng.toString()),
+//         Text(results.openingHours != null ? "Open" : "Closed"),
+//       ],
+//     ),
+//   );
+// }
 }
 
 class SignInScreen extends StatelessWidget {
@@ -316,4 +328,3 @@ class SignUpScreen extends StatelessWidget {
     );
   }
 }
-
