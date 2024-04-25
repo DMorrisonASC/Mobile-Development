@@ -63,7 +63,7 @@ class _MyHomePageState extends State<MyHomePage> {
   bool _locationLoaded = false; // Track if the location has been loaded
   bool _detailsLoaded = false; // Track if the location has been loaded
 
-  var apiKey = 'AIzaSyAnLTvi4kMJBcfUBFjB2aWS0j1zim7dAKA'; // Replace with your Google Maps API key
+  var apiKey = ''; // Replace with your Google Maps API key
   var placeId = 'ChIJqdGUQQgDGTkRMWBf2gAKAEQ';
   String radius = "9000";
 
