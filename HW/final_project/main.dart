@@ -43,7 +43,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: FirebaseAuth.instance.currentUser == null ? const MyHomePage(title: 'Flutter Demo Home Page') : MyHomePage(title: 'Welcome ${FirebaseAuth.instance.currentUser?.email}') ,
+      home: FirebaseAuth.instance.currentUser == null ? const MyHomePage(title: 'Bathroom Finder') : MyHomePage(title: 'Welcome ${FirebaseAuth.instance.currentUser?.email}') ,
     );
   }
 }
@@ -63,7 +63,7 @@ class _MyHomePageState extends State<MyHomePage> {
   bool _locationLoaded = false; // Track if the location has been loaded
   bool _detailsLoaded = false; // Track if the location has been loaded
 
-  var apiKey = ''; // Replace with your Google Maps API key
+  var apiKey = 'AIzaSyAnLTvi4kMJBcfUBFjB2aWS0j1zim7dAKA'; // Replace with your Google Maps API key
   var placeId = 'ChIJqdGUQQgDGTkRMWBf2gAKAEQ';
   String radius = "9000";
 
@@ -102,7 +102,26 @@ class _MyHomePageState extends State<MyHomePage> {
           GoogleMap(
             onMapCreated: _onMapCreated,
             initialCameraPosition: CameraPosition(target: _center, zoom: 11.0),
+            markers: {
+               Marker(
+                markerId: const MarkerId("Current Location"),
+                position: LatLng(_currentPosition.latitude, _currentPosition.longitude),
+              ),
+              if (nearbyPlacesResponse.results != null)
+                for (final e in nearbyPlacesResponse.results!)
+                  Marker(
+                    markerId: MarkerId(e.name ?? ""),
+                    position: LatLng(
+                      e.geometry?.location?.lat ?? 0,
+                      e.geometry?.location?.lng ?? 0,
+                    ),
+                    infoWindow: InfoWindow(
+                      title: e.name,
+                    )
+                  ),
+            }, // markers
           ),
+
           DraggableScrollableSheet(
             controller: sheetController,
             builder: (BuildContext context, scrollController) {
@@ -118,11 +137,13 @@ class _MyHomePageState extends State<MyHomePage> {
             });
 
           }, child: const Text("Get Nearby Places")),
+          // ElevatedButton(onPressed: (){
           //
-          // if(nearbyPlacesResponse.results != null)
-          //   for(int i = 0 ; i < nearbyPlacesResponse.results!.length; i++)
-          //     nearbyPlacesWidget(nearbyPlacesResponse.results![i])
-
+          //   // _getNearbyPlaces();
+          //   // setState(() {
+          //   //
+          //   // });
+          // }, child: const Text("Setting")),
         ],
       )
           : Center(
@@ -159,39 +180,20 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _getNearbyPlaces() async {
 
-    var url = Uri.parse('https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${_currentPosition.latitude},${_currentPosition.longitude}&radius=$radius&key=$apiKey');
+    // var url = Uri.parse('https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${_currentPosition.latitude},${_currentPosition.longitude}&radius=$radius&key=$apiKey');
+    // var types = 'amusement_park|aquarium|art_gallery|atm|bakery|bank|bar|cafe|campground|casino|movie_theater|convenience_store|department_store|hospital|library|museum|park|restaurant|shopping_mall|stadium|supermarket|train_station|university';
+    var types = 'restaurant';
+    var url = Uri.parse('https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${_currentPosition.latitude},${_currentPosition.longitude}&radius=$radius&type=$types&key=$apiKey');
 
     var response = await http.post(url);
 
     setState(() {
       nearbyPlacesResponse = NearbyPlacesResponse.fromJson(jsonDecode(response.body));
       _detailsLoaded = true;
-      debugPrint("Yup ${nearbyPlacesResponse.results?[0]}");
+      // debugPrint("Yup ${url}");
+      // debugPrint("Yup ${nearbyPlacesResponse.results?[0].placeId}");
     });
-
   }
-
-// Widget nearbyPlacesWidget(Results results) {
-//   return Container(
-//     width: MediaQuery.of(context).size.width,
-//     margin: const EdgeInsets.only(top: 10, left: 10, right: 10),
-//     padding: const EdgeInsets.all(5),
-//     decoration: BoxDecoration(
-//         border: Border.all(color: Colors.deepPurple),
-//         borderRadius: BorderRadius.circular(10)),
-//     child: Column(
-//       children: [
-//         Text("Name: " + results.name!),
-//         Text("ID: " + results.placeId!),
-//         Text("Location: " +
-//             results.geometry!.location!.lat.toString() +
-//             " , " +
-//             results.geometry!.location!.lng.toString()),
-//         Text(results.openingHours != null ? "Open" : "Closed"),
-//       ],
-//     ),
-//   );
-// }
 }
 
 class SignInScreen extends StatelessWidget {
