@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:getwidget/getwidget.dart';
 
 class Reviews extends StatelessWidget {
   final String placeId;
@@ -32,9 +33,11 @@ class Reviews extends StatelessWidget {
                   itemBuilder: (context, index) {
                     // Extract review data
                     var reviewData = reviews.values.toList()[index];
-                    return ListTile(
-                      title: Text("Review ID: ${reviews.keys.toList()[index]}"),
-                      subtitle: Text("Review Data: $reviewData"),
+                    return Card(
+                      child: GFListTile(
+                        title: Text("From Review ID: ${reviews.keys.toList()[index]}"),
+                        subTitle: Text("Review Data: $reviewData"),
+                      ),
                     );
                   },
                 );
