@@ -22,6 +22,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'listBathrooms.dart';
 
@@ -76,8 +77,6 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
     _getCurrentLocation(); // Call to get current location only once
-    _getNearbyPlaces();
-
   }
 
   @override
@@ -121,7 +120,6 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
             }, // markers
           ),
-
           DraggableScrollableSheet(
             controller: sheetController,
             builder: (BuildContext context, scrollController) {
@@ -137,13 +135,6 @@ class _MyHomePageState extends State<MyHomePage> {
             });
 
           }, child: const Text("Get Nearby Places")),
-          // ElevatedButton(onPressed: (){
-          //
-          //   // _getNearbyPlaces();
-          //   // setState(() {
-          //   //
-          //   // });
-          // }, child: const Text("Setting")),
         ],
       )
           : Center(
@@ -176,6 +167,7 @@ class _MyHomePageState extends State<MyHomePage> {
     });
     debugPrint(_currentPosition.latitude.toString());
     debugPrint(_currentPosition.longitude.toString());
+    _getNearbyPlaces();
   }
 
   void _getNearbyPlaces() async {
