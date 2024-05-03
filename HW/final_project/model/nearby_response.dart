@@ -1,3 +1,9 @@
+// Author: Daeshaun Morrison, Muhlenberg College class of 2024(daeshaunkmorrison@gmail.com)
+// Date: 5/3/2024
+// Instructor: Professor Silveyra
+// Description: Code generated from json using https://javiercbk.github.io/json_to_dart/
+// Errors:
+
 class NearbyPlacesResponse {
   List<Null>? htmlAttributions;
   List<Results>? results;
